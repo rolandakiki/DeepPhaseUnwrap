@@ -56,10 +56,10 @@ model.compile(
 
 model_path = 'DeepPhaseUnwrap/models/{}.h5'.format(model_id)
 model.load_weights(model_path)
-
+#%%
 ## predict true phase
 y_pred = model.predict(X_test, batch_size=batch_size)
-
+#%%
 ## get the scaled predicted true phase values
 y_pred_scaled = np.empty((0, 256, 256))
 for i in range(X_test.shape[0]):
@@ -80,13 +80,43 @@ r = np.max(y_test, axis=(1, 2), keepdims=True) - np.min(y_test, axis=(1, 2), kee
 NRMSE = np.mean(np.sqrt(np.mean(error**2, axis=(1, 2)))/r)*100
 performance = "NRMSE = {:.2f} %".format(NRMSE)
 print(performance)
-
+#%%
 ## visualize some predicted phase maps
 indices = np.random.randint(0, X_test.shape[0], size=(10, ))
+#%%
 for i in range(10):
   Xi = X_test[indices[i]]
   yi = y_test[indices[i]]
   ypi = y_pred_scaled[indices[i]]
+
+  # visualize
+  plot(Xi, yi, ypi, titles=["Noisy Wrapped Phase ($\psi$)", "True Phase ($\phi$)", "Predicted True Phase ($\hat{\phi}$)"])
+  plot_hist(yi, ypi, titles=["True Phase ($\phi$)", "Predicted True Phase ($\hat{\phi}$)"])
+#%%
+## get the scaled predicted true phase values
+y_pred_scaled = np.empty((0, 256, 256))
+for i in range(X_test.shape[0]):
+  Xi = X_test[i]
+  yi = y_test[i]
+  ypi = y_pred[i]
+  
+  # match scales of predicted true phase
+  ypi_scaled = ypi + np.median(yi - ypi)
+  y_pred_scaled = np.vstack((y_pred_scaled, ypi_scaled.reshape(1, 256, 256)))
+
+## compute Normalize Root Mean Squared Error
+error = y_test - y_pred_scaled
+r = np.max(y_test, axis=(1, 2), keepdims=True) - np.min(y_test, axis=(1, 2), keepdims=True)
+NRMSE = np.mean(np.sqrt(np.mean(error**2, axis=(1, 2)))/r)*100
+performance = "NRMSE = {:.2f} %".format(NRMSE)
+print(performance)
+#%%
+for i in range(10):
+  Xi = X_test[indices[i]]
+  yi = y_test[indices[i]]
+  ypi = y_pred[indices[i]]
+
+  ypi_scaled = ypi + np.median(yi - ypi)
 
   # visualize
   plot(Xi, yi, ypi_scaled, titles=["Noisy Wrapped Phase ($\psi$)", "True Phase ($\phi$)", "Predicted True Phase ($\hat{\phi}$)"])
