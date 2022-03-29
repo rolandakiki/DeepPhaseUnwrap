@@ -66,6 +66,20 @@ Use the `requirements.txt` file given in the repository to install the dependenc
 $ pip install -r requirements.txt 
 ````
 
+For MLBrief docker installation, use `tensorflow/tensorflow:2.4.3`, i.e. 
+
+```
+docker run -it --rm -v $(realpath ./DeepPhaseUnwrap):/tf/DeepPhaseUnwrap tensorflow/tensorflow:2.4.3 bash
+```
+
+Then inside the docker
+
+```
+cd /tf
+pip install -r  DeepPhaseUnwrap/docker_requirements.txt
+python DeepPhaseUnwrap/test_docker.py
+```
+
 ### Step 3 : Install Dependencies
 
 Use the `create_synthetic_phase_dataset.py`, `train_model.py` and `test_model.py` files to create phase datasets, train models, and validate them, respectively.          
